@@ -4,7 +4,7 @@ import io.kaitai.struct.datatype.DataType
 import io.kaitai.struct.datatype.DataType._
 import io.kaitai.struct.exprlang.Ast
 import io.kaitai.struct.format.Identifier
-import io.kaitai.struct.precompile.TypeMismatchError
+import io.kaitai.struct.precompile.{MethodNotFoundError, TypeMismatchError}
 
 abstract trait CommonMethods[T] extends TypeDetector {
   /**
@@ -69,6 +69,7 @@ abstract trait CommonMethods[T] extends TypeDetector {
       case et: EnumType =>
         attr.name match {
           case "to_i" => enumToInt(value, et)
+          case "to_s" => enumToStr(value, et)
           case _ => throw new TypeMismatchError(s"called invalid attribute '${attr.name}' on expression of type $valType")
         }
       case _: BooleanType =>
@@ -136,6 +137,7 @@ abstract trait CommonMethods[T] extends TypeDetector {
   def arrayMax(a: Ast.expr): T
 
   def enumToInt(value: Ast.expr, et: EnumType): T
+  def enumToStr(value: Ast.expr, et: EnumType): T = { throw new MethodNotFoundError("enumToStr", detectType(value)) }
 
   def boolToInt(value: Ast.expr): T
 
